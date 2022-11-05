@@ -1,5 +1,4 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { IfStmt } from '@angular/compiler';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -22,13 +21,9 @@ export class AuthService {
     const url = `${this.baseUrl}/auth/new`;
     const body = { name, email, password };
     return this.http.post<AuthResponse>(url, body).pipe(
-      tap((resp) => {
-        if (resp.ok) {
-          localStorage.setItem('token', resp.token!);
-          this._user = {
-            name: resp.name!,
-            uuid: resp.uuid!,
-          };
+      tap(({ ok, token }) => {
+        if (ok) {
+          localStorage.setItem('token', token!);
         }
       }),
       map((resp) => resp.ok),
@@ -43,10 +38,6 @@ export class AuthService {
       tap((resp) => {
         if (resp.ok) {
           localStorage.setItem('token', resp.token!);
-          this._user = {
-            name: resp.name!,
-            uuid: resp.uuid!,
-          };
         }
       }),
       map((resp) => resp.ok),
@@ -67,6 +58,7 @@ export class AuthService {
         this._user = {
           name: resp.name!,
           uuid: resp.uuid!,
+          email: resp.email!,
         };
         return resp.ok;
       }),
